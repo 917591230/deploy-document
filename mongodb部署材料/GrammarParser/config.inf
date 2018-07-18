@@ -1,0 +1,11 @@
+﻿#mongodb的IP，端口号，以及数据用户名和密码
+mongodbIp = localhost
+mongodbPort = 27017
+databaseName = zhijian
+
+#url = http://192.168.2.222:8080/hello/task
+url = http://localhost:3557
+
+batchnum = 256
+threadnum =4
+blockingqueue = 50000

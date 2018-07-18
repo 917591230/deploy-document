@@ -1,0 +1,80 @@
+创建maven项目：
+	使用maven的骨架工程生成web项目和普通项目，骨架工程可以理解为是maven提供的模板
+
+
+spring boot 的启动理解过程
+1. @SpringBootApplication：Spring Boot 应用的标识
+2. Application很简单，一个main函数作为主入口。SpringApplication引导应用，并将Application本身作为参数传递给run方法。具体run方法会启动嵌入式的Tomcat并初始化Spring环境及其各Spring组件。
+
+spring boot 自定义配置文件映射到类的问题
+
+@component + @Value component注册为组件，Value注入值
+@Component + @ConfigurationProperties (prefix="") + @PropertySource("classpath")  spring boot 1.5之后ConfigurationProperties注解没有了location属性
+
+@Component + @ConfigurationProperties (prefix="") 就可以得到配置类
+读取默认application.properties配置文件方法
+	// 在Controller类上加@RestController表示将此类中的所有视图都以JSON方式显示，类似于在视图方法上加@ResponseBody。
+	使用@Value方式，@Value的${}中包含的是核心配置文件中的键名
+
+	@SpringBootApplication注解中已经包含了@ComponentScan和@EnableConfigurationProperties注解。
+
+spring boot 整合mybatis注解+映射文件开发，
+	第一步：引入mysql连接驱动依赖，和spring boot mybatis依赖
+	第二步：配置扫描mapper接口层，有两种注解是实现方案
+		spring boot 整合mybatis注解开发，配置mapper接口层的两种方式
+		mapper接口层使用注解@Mapper
+		springboot启动类使用注解@MapperScan ,需要配置包扫描包路径
+		注意：之前使用springboot整合mybatis，项目启动失败，报
+		java.lang.annotation.AnnotationFormatError: Invalid default: public abstract java.lang.Class org.mybatis.spring.annotation.MapperScan.factoryBean()
+		修改springboot父依赖，把springboot 1.5.1改为 1.5.10后启动正常
+	第三步：在springboot启动默认配置文件中，配置mapper接口映射文件*.xml路径，mybatis.mapperLocations=classpath:mapper/*.xml
+	第四步：配置数据源信息,spring.datasource.url、spring.datasource.username、spring.datasource.password、spring.datasource.driver-class-name
+
+@Param注解主要用在dao层（mapper接口层），给参数命名，名称就是花括号中的字符串，属于mybatis注解
+	注意：不适用@Param注解时，在mapper配置文件，属性parameterType 只能是单一参数，使用@Param可以是多个参数
+	注意：使用了@pram注解的话在mapper.xml不加parameterType，因为在接口就声明了类型，加上@pram后自动识别
+	注意：不使用@Param注解时，参数只能有一个，如果有多个参数（int，String等）的话，必须用map取值，用索引取值，麻烦而且不清晰。
+	注意：当注入sql参数可能为空时，一定要指定jdbcType=数据类型
+
+	①如果使用@Param注解来生命参数，使用#{}或者#{}的方式都可以
+	Select ("select column from table where userid = ${userid}")
+	public int select Column (@Param("userid") int userid )
+
+	②如果不使用@Param注解生命参数，必须使用#{}方式注入参数
+	@Select("select column from table where userid = ${userid} ")
+	public int selectColumn(@Param("userid") int userid);
+
+	③如果不使用@Param注解，参数只能有一个，并且是javabean，在sql语句中可以直接引用JavaBean的属性，而且只能引用javabean属性
+        // 这里id是user的属性
+	@Select("SELECT * from Table where id = ${id}")
+	Enchashment selectUserById(User user)
+
+
+服务器响应状态吗：
+	301 moved permanently、302 found、303 see other
+	301/302/303都表示重定向
+
+304 not modified
+	服务器端资源未改变，可直接使用客户端未过期的缓存）。304状态码返回时，不包含任何响应的主体部分。304虽然被划分在3xx类别中，但是和重定向没有关系。
+
+400 bad request
+	表示请求的报文中存在语法错误，比如url含有非法字符。
+	提交json时，如果json格式有问题，接收端接收json，也会出现400 bad request
+	比如常见的json串，数组不应该有",但是有"了。
+	错误的json
+
+405 method not allowed
+	问题原因：  请求的方式（get、post、delete）方法与后台规定的方式不符合。
+	比如： 后台方法规定的请求方式只接受get，如果用post请求，就会出现 405 method not allowed的提示
+
+415 unsupported media type
+	后台程序不支持提交的content-type，就会返回415，spring mvc错误信息如下
+	The server refused this request because the request entity is in a format not supported by the requested resource for the requested method.
+	使用postman 访问服务器添加记录到数据库，报415 发现是post数据类型错选为txt，改为json后报 400，
+
+响应行-状态码
+	1xx：指示信息--表示请求已接收，继续处理
+	2xx：成功--表示请求已被成功接收、理解、接受
+	3xx：重定向--要完成请求必须进行更进一步的操作
+	4xx：客户端错误--请求有语法错误或请求无法实现
+	5xx：服务器端错误--服务器未能实现合法的请求
