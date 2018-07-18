@@ -1,0 +1,4 @@
+win10 2016 长期服务版的ISO文件中本身就带有KMS激活KEY，不用输入任何KEY，连接网络进入CMD，只要输入：
+slmgr /skms kms.digiboy.ir
+slmgr /ato
+这两条命令，就可以KMS激活。
