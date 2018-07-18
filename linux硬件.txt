@@ -62,3 +62,7 @@ mongodb 3.4.0
 ngqualitymdl-control-1.0.0.jar
 ngqualitymdl-core-1.0.0.jar
 ngqualitymdl-engine-1.0.0.jar
+
+
+
+=+=+=+=+=+=+=+=+=+=+=+=+=+=

@@ -95,11 +95,27 @@ truncate table 表名;
 delete from 表名
 
 
-#########################################mongodb 操作
+########################   mongodb 操作
 查询某个字段所有值
 db.foo.distinct("字段名")；
 查询Collection的文档计数
 db.foo.fing().count();
+查询文档
+db.collection.find(query,projection)
+	query:可选，使用查询操作符指定查询条件
+	projection：可选，使用投影操作符指定返回的键。查询时返回文档中所有的键值， 秩序省略
+			该参数即可（默认省略）。
+	若不指定 projection，则默认返回所有键，指定 projection 格式如下，有两种模式
+		db.collection.find(query, {title: 1, by: 1}) // inclusion模式 指定返回的键，不返回其他键
+		db.collection.find(query, {title: 0, by: 0}) // exclusion模式 指定不返回的键,返回其他键
+	两种模式不可混用（因为这样的话无法推断其他键是否应返回）
+		db.collection.find(query, {title: 1, by: 0}) // 错误
+	只能全1或全0，除了在inclusion模式时可以指定_id为0
+		db.collection.find(query, {_id:0, title: 1, by: 1}) // 正确
+
+格式化方式显示所有文档
+	db.collection.find().pretty()
+
 
 ####################################linux 文本内容清空
 echo " " > test.log
@@ -222,7 +238,9 @@ mysql 官方推荐默认安装位置是，从mysql.server脚本就可以找到�
 		注意：
 			因为我们安装mysql5.6,而且卸载了预装mysql，所以会把/etc/my.cnf 卸载掉，
 		所以不能通过修改配置文件来修改编码。我们需要登陆数据库来，在数据库内修改。
-
+		参考博客：查看数据有关编码的各个字段解释。
+			https://blog.csdn.net/woslx/article/details/49685111
+			https://www.cnblogs.com/JMLiu/p/8313204.html
 		查看全局编码格式：
 			show variables like 'character%';
 			修改全局编码：
@@ -251,10 +269,13 @@ mysql 官方推荐默认安装位置是，从mysql.server脚本就可以找到�
 
 		刷新权限
 			FLUSH PRIVILEGES;
-
+		错误信息 ;mysql 5.7 Aborted connection * to db: 'unconnected' user :'*' host: '*' (init_connect command failed)
 
 		ln -s [源文件] [目标路径]  可以达到和修改/etc/profile 同样的效果，
 		但是需要把源文件连接到 /usr/bin/下。
+
+	10、mysql 错误码解析：
+		https://blog.csdn.net/liuxingbin/article/details/1880901
 #########################
 二进制包安装mysql 5.7.22
 mysqld --initialize-insecure --user=develop --basedir=/home/develop/mysql/ --datadir=/home/develop/mysql/data/
@@ -494,6 +515,8 @@ exit命令或者使用CTRL+D.
 		docker container stop [容器ID/容器名]
 	启动docker 容器
 		docker container start [容器ID/容器名]
+	进入dockers容器
+		docker exec -it [容器ID/容器名] bash
 
 	运行docker容器
 		docker container run [opts]
@@ -538,12 +561,9 @@ exit命令或者使用CTRL+D.
 
 
 ######### docker 安装MySQL ########################
-
-docker run -p 3306:3306 --name mymysql -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/logs -v $PWD/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
-
-docker run -p 3305:3306 --name dc-mysql-1 -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/logs -v $PWD/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
-docker run -p 3305:3305 --name dc-mysql -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/logs -v $PWD/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
-
+## 挂在文件
+docker run -p 3306:3306 --name mysql -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456  -d mysql:5.7.21
+## 挂在文件和创建用户（没有给用户授权，需要手动授权）
 
 
 docker run -d --name dc-sonar -p 9000:9000 -p 9092:9092 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://172.17.0.2:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
@@ -554,10 +574,14 @@ docker run -d --name dc-sonar -p 9000:9000 -e "SONARQUBE_JDBC_USERNAME=sonar" -e
 关于 docker soanrqube + msysql 的 关于java.lang.IllegalStateException: Can not connect to database. Please check connectivity and settings (see the properties prefixed by 'sonar.jdbc.').错误的解决方案
 请看：https://github.com/thyrlian/SonarOnDocker 目前，还有有解决
 ####  这一条命令可以成功执行
-docker run --name dc-mysql -e MYSQL_ROOT_PASSWORD=123456 -p 3305:3306 -d mysql:5.7.21
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:5.7.21
+ 或者是使用挂载路径的方式(以验证可以使用，注意不要挂在到/var/lib/mysql,会报错，这个问题浪费两天时间)：
+ 使用-v 挂在文件之前，需要先创建源文件挂载文件存在,挂在的配置文件必须是my.cnf，如果是my.conf或者mysql.conf都是错误的。
+docker run -p 3306:3306 --name mysql -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456  -d mysql:5.7.21
+docker run --name mysql -p 3307:3306 --restart always -v ~/mysql/data:/var/lib/mysql -v ~/mysql/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+docker run --name mysql -p 3307:3306 --restart always --privileged=true -v ~/mysql/data:/var/lib/mysql -v ~/mysql/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
 
-
-docker run -d --name dc-sonar -p 9000:9000 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://127.0.0.1:3305/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
+docker run -d --name sonar -p 9000:9000 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://127.0.0.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
 
 ############### docker 搭建 soanr+postgresql    #############################
 目前，已经搭建成功。
@@ -565,13 +589,34 @@ docker run --name pgdb -e POSTGRES_USER=sonar -e POSTGRES_PASSWORD=sonar -d post
 
 docker run --name dc-sonar --link pgdb -e SONARQUBE_JDBC_URL=jdbc:postgresql://pgdb:5432/sonar -p 9000:9000 -d sonarqube
 
-docker run --name mysql5.7.21 -p 3305:3306 -v $PWD/mysql/datadir:/var/lib/mysql -v $PWD/mysql/my.cnf:/etc/mysql/conf.d -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7
-
-docker run --name mysql5.7.21 -p 3305:3306 -v /my/mysql/datadir:/etc/lib/mysql -v /my/mysql/mysql.cnf:/etc/mysql/mysql.cnf -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
-
-
 
 
 
 ############ 查看linux 登陆日志 ##############
 cat var/log/secure  日志中两行登录日志
+
+
+docker run -p 3306:3306 --name mysql -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/logs -v $PWD/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+
+
+
+sudo docker run -d -p 3308:3306 --name mysql --restart always --privileged=true  -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_USER="clayton" -e MYSQL_PASSWORD="123456" -e MYSQL_ROOT_PASSWORD="123456"  mysql:5.7.21
+
+
+docker容器出现这个错误 iptables failed: iptables --wait -t nat -A DOCKER&n
+解决方法：需要重启docker服务
+systemctl restart docker
+
+
+
+#7月14日申请筛选数据
+{
+	"params": {
+		"modelId": "201807051744084284665,201807131343303824705,201807131350395844706,201807131359462874707,201807131403400024708,201807131410436394709,201807131414576774710,201807131419300594711",
+		"uuid": "45e08735-70cd-4a62-afc3-965fe14c06fc",
+		"onestPrefix": "cluster2",
+		"dataSounceType": 99910086,
+		"fnomFile": "epc|DHXX_zyzj_0_20180714152503_zyzx_99910086_TRANS_INPUT_0d8f6eba-8b4b-477d-adb0-753d79cbb97f_l.txt",
+		"toFile": "epc|DHXX_zyzj_0_20180704165608_zyzx_99910086_FILTER_INPUT_0d8f6eba-8b4b-477d-adb0-753d79cbb97f_l.txt"
+	}
+}
