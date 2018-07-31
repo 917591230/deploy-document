@@ -489,6 +489,7 @@ com.fasterxml.jackson.databind.JsonMappingException: Instantiation of [simple ty
 众包质检本地测试请求引擎模型上线不报错，但是重启引擎会报错
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 
 16:47 2018/7/20
 
@@ -496,3 +497,5 @@ com.fasterxml.jackson.databind.JsonMappingException: Instantiation of [simple ty
 1、推动洛阳测试环境筛选接口性能测试 60%
 =======
 >>>>>>> 35b429a6c837996c03a441a401c8c92e68b7aa73
+=======
+>>>>>>> remotes/origin/master
