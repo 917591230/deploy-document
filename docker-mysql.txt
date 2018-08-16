@@ -1,0 +1,30 @@
+1-4需要root权限
+5-7使用切换到普通帐户下执行
+
+1、安装 Docker
+yum -y install docker
+2、启动 Docker 后台服务
+service docker start
+3、安装之后启动 Docker 服务，并让它随系统启动自动加载。
+systemctl enable docker
+4、拉取官方的镜像,标签为5.7.21
+docker pull mysql:5.7.21
+5、创建文件夹
+mkdir -p ~/mysql/data ~/mysql/logs
+6、创建配置文件文件
+touch ~/mysql/my.cnf && chmod 775 ~/mysql/my.cnf
+7、启动mysql
+docker run --name mysql -p 3306:3306 --restart always -v ~/mysql/data:/var/lib/mysql -v ~/mysql/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+
+
+### mysql配置文件 my.cnf内容
+
+[client]
+default-character-set = utf8mb4
+[mysql]
+default-character-set = utf8mb4
+[mysqld]
+character-set-client-handshake = FALSE
+character-set-server = utf8mb4
+collation-server = utf8mb4_unicode_ci
+init_connect='SET NAMES utf8mb4'
