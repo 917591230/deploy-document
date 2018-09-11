@@ -2,3 +2,35 @@ win10 2016 长期服务版的ISO文件中本身就带有KMS激活KEY，不用输
 slmgr /skms kms.digiboy.ir
 slmgr /ato
 这两条命令，就可以KMS激活。
+
+
+激活windows10 LTSB 2016
+slmgr /ipk DCPHK-NFMTC-H88MJ-PFHPY-QJ4BJ
+slmgr /skms xykz.f3322.org
+
+slmgr /ato
+
+
+激活Office2016专业增强VL版
+cd C:\Program Files\Microsoft Office\Office16  
+cscript ospp.vbs /sethst:xykz.f3322.org  
+cscript ospp.vbs /dstatus #查看原密钥后五位  
+cscript ospp.vbs /unpkey:XXXXX #卸载原密钥，XXXXX代表后五位  
+cscript ospp.vbs /inpkey:XQNVK-8JYDB-WJ9W3-YJ8YR-WFG99  
+cscript ospp.vbs /act 
+    
+
+目前(2017年5月)有效的KMS服务器地址，无效的就不列出来了
+xykz.f3322.org 有效
+kms.chinancce.com 有效
+kms.lotro.cc 有效
+www.zgbs.cc 有效
+cy2617.jios.org 有效
+kms-win.msdn123.com 有效 
+k.zpale.com m.zpale.com mvg.zpale.com 有效 
+kms.shuax.com 有效
+ss.yechiu.xin 有效
+kms.dwhd.org 有效
+kms.03k.org 有效
+kms.luody.info 有效
+kms.digiboy.ir 有

@@ -1,0 +1,622 @@
+项目启动监控命令
+./startup.sh  && tail ../logs/catalina.out
+
+192.168.151.177 洛阳设备 可以调到生产
+	ssh nquality@192.168.199
+
+
+192.168.124.130设备 是洛阳测试机
+	18080 测试接口
+	28080 接口机
+	8080 引擎
+
+
+质检项目 git仓库地址：
+email
+name
+
+lichangyuan@thinkit.cn
+lichangyuan
+
+引擎项目git仓库地址
+git clone http://192.168.96.89:3000/thinkit_zyzj/engine_mdl.git
+接口机项目git仓库地址
+git clone http://192.168.96.89:3000/thinkit_zyzj/ngquality_mdl.git
+
+
+scp /home/asr/
+
+
+生产myslq地址：
+url						域名								username		passward
+192.168.156.231:20830	ngquality-mdl.db.cs.core.cmos        -ungquality_mdl -pos6H$tpJOx4Y5ahV
+
+
+jdbc:mysql://ngquality-mdl.db.cs.core.cmos/ngquality_mdl
+
+jdbc:mysql://ngquality-mdl.db.cs.core.cmos//ngquality_mdl?user=ungquality_mdl&password=os6H$tpJOx4Y5ahV
+
+从远程复制到本机
+	目录
+scp -r asr@192.168.124.130:/home/asr/software/mysql
+scp -r zky_wenjun@192.168.151.117:/home/zky_wenjun/mysql
+	文件
+scp zky_wenjun@192.168.151.117:/home/zky_wenjun/mysql /home/ngquality/software/
+从本机复制到远程主机  文件
+scp /home/zky_wenjun/mysql ngquality@192.168.159.199:/home/ngquality/software/
+
+scp -r /home/zky_wenjun/lichangyuan ngquality@192.168.159.199:/home/ngquality/
+scp -r jinxikun@172.18.182.215:D:/lichangyuan/ /home/zky_wenjun/
+
+
+生产服务器不能够从里面操作外面
+可以从177跳板机上传东西到199生产机
+
+
+生产mysql数据库链接测试
+./mysql -h ngquality-mdl.db.cs.core.cmos -P 20830 -ungquality_mdl -pos6H$tpJOx4Y5ahV
+./mysql -h ngquality-mdl.db.cs.core.cmos  -ungquality_mdl -pos6H$tpJOx4Y5ahV
+
+mysql数据库测试服务器连接测试
+./mysql -h 192.168.155.254 -P8066 -ungqualityzb -paDjnPL#fjQ)Ph$#R
+
+mysql查询结果输出到文件
+（1）
+	mysql> select count(1) from table   into outfile '/data/test.xls';
+	报错：
+	ERROR 1 (HY000): Can't create/write to file '/data/test.xls' (Errcode: 13)
+	可能原因：mysql没有向/data/下写的权限
+（2）
+	PAGER set to 'cat > /tmp/test.txt'
+	之后的所有查询结果都自动写入/tmp/test.txt'，并前后覆盖
+	跳出mysql命令行  这种方式可以将结果导出到本地文件
+	[root@SHNHDX63-146 ~]# mysql -h 127.0.0.1 -u root -p XXXX -P 3306 -D database_name -e "select * from table"  > /tmp/test/txt
+
+ngquality_mdl
+
+./myslq
+在linux下访问远程mysql，提示没有找到mydql指令，需要启动mysql
+启动mysql
+
+mysql -h localhost -u 用戶名 -p密碼                //連接數據庫
+use desk_show;                                          //使用數據庫
+show tables;                                              //顯示數據表
+describe desk6_0;                                     //顯示表結構
+show databases; 显示数据库
+create database name; 创建数据库
+ 执行命令source /root/20151010.sql
+
+drop database name 直接删除数据库，不提醒,
+一般我们只用删除数据库数据，而中国移动在线的数据库不允整体删除。需要根据主键删除 where id >0;
+-- 清空全部数据，不写日志，不可恢复，速度极快
+truncate table 表名;
+
+-- 清空全部数据，写日志，数据可恢复，速度慢
+delete from 表名
+
+
+########################   mongodb 操作
+查询某个字段所有值
+db.foo.distinct("字段名")；
+查询Collection的文档计数
+db.foo.fing().count();
+查询文档
+db.collection.find(query,projection)
+	query:可选，使用查询操作符指定查询条件
+	projection：可选，使用投影操作符指定返回的键。查询时返回文档中所有的键值， 秩序省略
+			该参数即可（默认省略）。
+	若不指定 projection，则默认返回所有键，指定 projection 格式如下，有两种模式
+		db.collection.find(query, {title: 1, by: 1}) // inclusion模式 指定返回的键，不返回其他键
+		db.collection.find(query, {title: 0, by: 0}) // exclusion模式 指定不返回的键,返回其他键
+	两种模式不可混用（因为这样的话无法推断其他键是否应返回）
+		db.collection.find(query, {title: 1, by: 0}) // 错误
+	只能全1或全0，除了在inclusion模式时可以指定_id为0
+		db.collection.find(query, {_id:0, title: 1, by: 1}) // 正确
+
+格式化方式显示所有文档
+	db.collection.find().pretty()
+
+
+####################################linux 文本内容清空
+echo " " > test.log
+> test.log
+cat /dev/null > test.log
+
+
+linux 下
+	. 和./ 表示当前目录，一般不用. 常用 ./运行当前目录文件
+
+
+模型测试流程
+	新规则入库
+	启动引擎项目
+	linux下执行curl命令参数不加 ”'“ 号
+	查看结果集中
+	java -jar Grammar.jar
+
+
+172.18.181.139_服务器
+云桌面账号：wenjun
+		      ZYzx#2016
+		      jinxikai
+		      Thinkit#2017
+
+idea maven 打包命令 跳过测试用例
+
+clean install -D skipTests
+
+jvm 启动参数
+java -jar -Dcmos.system.id=ngquality_mdl -Dcmos.instance.id=ngquality_mdl_tomcat1
+java -jar *.jar
+
+
+
+
+
+
+查看下系统信息，确认是32位还是64位：
+	uname -a
+查看系统发行版本号
+	cat /etc/issue
+	lsb_release -a （适用于所有的linux，包括Redhat、SuSE、Debian等发行版，但是在debian下要安装lsb）
+查看内核方法
+
+	more /proc/version
+###安装jre，同jdk
+	1、查看现有安装jdk版本
+		rpm -qa | grep -i java
+	2、卸载已有安装软件
+		rpm -e -- nodeps 软件名
+	3、配置系统环境变量
+		export JAVA_HOME=/home/jre1.8.0_161
+		export PATH=$JAVA_HOME/bin:$PATH
+
+
+
+#######################################安装mysal
+mysql 官方推荐默认安装位置是，从mysql.server脚本就可以找到如下配置
+	  basedir=/usr/local/mysql
+	  bindir=/usr/local/mysql/bin
+
+安装rpm包时遇到error:Failed dependencies解法方法：
+如果在安装过程中出现错误提示说需要依赖包(error : Failed dependencies)，加上--nodeps 不验证套件的相关性
+
+	rpm -ivh mysql-community-server-5.7.18-1.el6.x86_64.rpm --nodeps
+	rpm -ivh mysql-community-client-5.7.18-1.el6.x86_64.rpm --nodeps
+	1、查看当前mysql版本
+		1、rpm -qa | grep -i mysql
+	2、卸载mysql
+		rpm -e mysql-libs-5.1.71-l* .x86_x64 --nodeps;
+		用yum卸载
+		yum remove mysql-libs-5.1.*.x86_x64;
+	3、rpm安装方式，如果是bundle包，需要先解压出server和client
+		rpm -ivh mysql-community-server-5.7.18-1.el6.x86_64.rpm --nodeps
+		rpm -ivh mysql-community-client-5.7.18-1.el6.x86_64.rpm --nodeps
+		yum 安装方式
+		yum install MySQL-*.rpm
+	4、修改root密码,安装完默认免密码登陆
+		以前使用过的设置密码方式：/usr/bin/mysqladmin -u root password '123456'
+		下面是最近在mysql5.6上使用的方式
+			use mysql;
+			select * from user;
+		注意：查询表数据列明是password，说明是mysql5.6，如果是anthentication_string就是mysql5.7,而且root密码不能过于简单，
+		使用mysql 5.6
+			update user set password = password('123456');
+		使用mysql 5.7
+			update user set authentication_string=password('123456') where user='root';（没有尝试）
+			或者
+			update user set authentication_string = password('123456'), password_expired = 'N', password_last_changed = now() where user = 'root';（尝试过）
+			不使用密码安全验证
+			set global validate_password_policy=0;
+			设置密码长度验证
+			set global validate_password_length=1;
+			set global validate_password_mixed_case_count=2;
+			#修改密码
+			set password=password('123456');
+			#关闭安全校验插件，vim /etc/my.cnf ，添加如下配置，否则 远程访问会访问不到。
+			validate_password=OFF
+	5、刷新特权
+		flush privileges;
+	6、配置远程访问
+		grant all on *.* to 'root'@'%' with grant option;
+		grant all on sonar.* to 'soanr'@'%' with grant option;
+			grant	授权
+			all		表示所有权限（增删权限）
+			'*.*'		表示所有数据库中所有表
+						例如：day15_db.*,表示day15_db数据库中的所有表
+			root	表示帐户名
+			%		表示远程主机可以访问
+			with grant option		固定写法，可以将权限授予
+			@		用于连接用户名和ip地址(域名) 固定格式： '用户名'@'ip地址(域名)'
+			flush privileges;
+		测试远程访问	(一定要加上端口号)：
+			命令行方式：mysql -h 118.25.5.243 -P 3306 -u root -p123456
+	7、配置mysql 开机启动
+		chkconfig mysqld on；
+
+	8、修改mysql编码，
+		注意：
+			因为我们安装mysql5.6,而且卸载了预装mysql，所以会把/etc/my.cnf 卸载掉，
+		所以不能通过修改配置文件来修改编码。我们需要登陆数据库来，在数据库内修改。
+		参考博客：查看数据有关编码的各个字段解释。
+			https://blog.csdn.net/woslx/article/details/49685111
+			https://www.cnblogs.com/JMLiu/p/8313204.html
+		查看全局编码格式：
+			show variables like 'character%';
+			修改全局编码：
+				set character_set_database = utf8;
+				......
+				但是不要修改character_set_filesystem的编码。
+			修改数据库编码
+				use 库名；
+				status;
+				set names 'utf8';
+				status; //查看是否是否生效
+	9、创建帐户并授权数据库权限
+		查询所有用户 mysql 5.7
+		select user , host , authentication_string FROM mysql.user;
+		创建数据库
+			CREATE DATABASE sonar CHARACTER SET utf8 COLLATE utf8_general_ci;
+			CREATE DATABASE ngqualitymdl CHARACTER SET utf8 COLLATE utf8_general_ci;
+		创建用户和密码
+			CREATE USER 'sonar' IDENTIFIED BY '123456';
+			CREATE USER 'ngqualitymdl' IDENTIFIED BY '123456';
+		配置sonar库可以远程访问 ，授权详细看上面的刷新权限解释
+			GRANT ALL ON sonar.* TO 'sonar'@'%' IDENTIFIED BY 'sonar';
+			GRANT ALL ON *.* TO 'ngqualitymdl'@'%' IDENTIFIED BY 'ngqualitymdl';
+		配置sonar库本地访问
+			GRANT ALL ON sonar.* TO 'sonar'@'localhost' IDENTIFIED BY 'sonar';
+
+		刷新权限
+			FLUSH PRIVILEGES;
+		错误信息 ;mysql 5.7 Aborted connection * to db: 'unconnected' user :'*' host: '*' (init_connect command failed)
+
+		ln -s [源文件] [目标路径]  可以达到和修改/etc/profile 同样的效果，
+		但是需要把源文件连接到 /usr/bin/下。
+
+	10、mysql 错误码解析：
+		https://blog.csdn.net/liuxingbin/article/details/1880901
+#########################
+二进制包安装mysql 5.7.22
+mysqld --initialize-insecure --user=develop --basedir=/home/develop/mysql/ --datadir=/home/develop/mysql/data/
+
+./mysql_ --initialize-insecure --user=develop --basedir=/home/develop/mysql/ --datadier=/home/develop/mysql/data
+
+##########################################linux 防火墙
+centOs 6.5 关闭防火墙
+	关闭命令：  service iptables stop
+        永久关闭防火墙：chkconfig iptables off
+	两个命令同时运行，运行完成后查看防火墙关闭状态
+        service iptables status
+
+centOs 7.0 关闭防火墙
+ service firewalld stop
+
+centOs 7.0和 6.0 服务操作命令区别
+
+ centOs 7.0															centOs 6.0
+ service firewalld status || systemctl status firewalld.service			service iptables status
+
+添加防火墙过滤规则
+ -A INPUT -m state --state NEW -m tcp -p tcp --dport 3306 -j ACCEPT
+
+keepalive单利安装
+	yum -y install keepalived-1.2.13-5.el6_6.i686.rpm
+
+###linux端口号与PID的互相查询
+####非管理员权限只能查看部分pid，所以需要使用sudo命令
+查看当前系统下的搜友端口情况：sudo netstat -antup
+### 用pid查看端口号
+sudo netstat -antup | grep PIDNumber
+###用进程名查看PID号（在非管理员权限，使用sudo可以看到所有用户的进程）
+sudo ps -ef | grep ProcessName
+
+###unzip: command not found的错误。
+	yum install -y unzip zip
+
+
+jenkins 初始密码：b6c0d8d2d34e486c9c3efa0389139209
+
+jenkins url;
+http://118.25.5.243:9001/
+
+sonarqube url:
+118.25.5.243:9000
+
+dubbo-console url：
+118.25.5.243:8081
+
+zookeeper url :
+118:25.5.243:2181
+
+###linux下，post请求
+curl -H "Content-Type: application/json" -X POST  --data '{"data":"1"}'  http://localhost:28080/ngquality_mdl/result/ReceivePreviewResult
+http://localhost:28080/ngquality_mdl/result/ReceiveMatchResult
+
+curl -H "Content-Type: application/json" -X POST  --data '{
+    "toFile": "D:/home/ngquality/taskTxt/2018/04/23/1234567890/txts",
+    "rtnMsg": "成功",
+    "uuid": "1283094105212",
+
+}'  http://127.0.0.1/
+
+##########质检项目打包必须加jvm启动参数coms.system.id
+jvm 启动参数
+java -jar -Dcmos.system.id=ngquality_mdl -Dcmos.instance.id=ngquality_mdl_zero ./ngqualitymdl-control-1.0.0-SNAPSHOT.jar
+java -jar -Dcmos.system.id=ngquality_mdl -Dcmos.instance.id=ngquality_mdl_one ./ngqualitymdl-control-1.0.0-SNAPSHOT.jar
+
+
+
+
+jmeter测试
+./jmeter.sh -n -t ngqualitymdl_test.jmx  -l ngqualitymdl_result.jtl
+
+nmon 测试
+./nmon_x86_64_sles11 -s10 -c60 -f -m /home/asr/
+
+
+
+生产上线 质检项目需要准备材料
+
+2018/6/8
+做一次8个模型测试结果
+
+测试接口脚本(预览，筛选，上线，下线)，清理数据库脚本，配置文件(数据库连接配置，zk服务配置，接口和引擎dubbo服务配置)，
+	Onest 桶配置信息
+环境测试 jdk 1.8，防火墙配置，端口配置
+上线顺序，首先部署引擎mongodb数据库副本集测试
+	单台 引擎启动，引擎测试
+	单台 接口service层启动，接口web层启动，开始测完整流程
+	安装nginx，修改配置文件()
+	重复上面操作
+
+
+
+#### 质检本地开发mysql项目名
+local.driverClassName=com.mysql.jdbc.Driver
+local.url=jdbc:mysql://localhost:3306/ngquality_mdl?useUnicode=true&characterEncoding=utf8
+local.username=ngquality_mdl
+local.password=rO0ABXciABDZjHG/EF8On7T06U2N98sXA7q2Nl/Y1yUHLZ7S3BpSNg==
+
+maven 常用命令
+
+-DskipTests，不执行测试用例，但编译测试用例类生成相应的class文件至target/test-classes下。
+
+-Dmaven.test.skip=true，不执行测试用例，也不编译测试用例类
+
+##########################
+遇到云服务被用来挖矿，停掉后台挖矿进程后仍然或自动重启，删掉/tmp/下面的所有文件依然会自动重建
+所以就用一下操作来禁止生成文件
+ echo "" > qW3xT      //清空文件内容
+ chmod ugo-rwx qW3xT  //收缩文件访问权限限
+ chattr +i qW3xT      //防止文件为修改
+
+
+###sonarqube 使用maven使用sonarqube扫描仪
+
+mvn sonar:sonar -Dsonar.host.url=http://192.168.80.20:9000 -Dsonar.login=24102a9487be93f3fe61d38c374c4c1691ee873c
+
+
+
+
+##########通过ide推送代码扫描结果到sonarqube,
+需要用到soqnarqube sonar-Scanner 工具
+
+1、在项目的pom中添加 cobertura 统计代码扫描插件
+
+2、在sonar-sacaner配置文件sonar-scanner.properties中配置 sonar.host.url=http://192.168.100.9:9009 ，这个url指定sonar服务器地址
+
+
+3、在项目根路径下创建sonar-project.properties配置文件，需要配置内容如下
+sonar.projectKey=com.cmos:testInfo			//必须sonar中的唯一
+sonar.projectName=com.cmos:testInfo			//项目名称
+sonar.projectVersion=1.0				//项目版本
+sonar.sources=./src/main/java				//sonar扫描目录
+sonar.sourceEncoding=UTF-8
+sonar.language=java
+soanr.cobertura.reportPaths=cobertura.xml		//cobertura.xml路径,获取单元测试覆盖率
+sonar.modules=ngqualitymdl-web,ngqualitymdl-bean		//pom中全部模块名称
+ngqualitymdl-web.sonar.projectName=ngqualitymdl-web		//sonar中每个模块名称
+ngqualitymdl-bean.sonar.projectName=ngqualitymdl-bean
+.....
+#sonar.modules=ngqualitymdl-service-impl,ngqualitymdl-bean  //core不能和web层分开扫描，扫描web层，现在ide启动core层
+#ngqualitymdl-service-impl.sonar.projectName=ngqualitymdl-service-impl		//sonar中每个模块名称
+#ngqualitymdl-bean.sonar.projectName=ngqualitymdl-bean
+#....
+
+4、idea 中运行mave命令： clean compile cobertura:cobertura
+
+5、进入soanr-scanner的bin/下sonar-runner或sonar-scanner命令
+
+6、登陆sonarqube查看扫描结果。
+######################################### soanrqube 代码扫描成功
+
+
+############################## linux 给账号赋予root账号身份执行命令#################
+并非所有yoghurt都能够执行sudo，因为有权限的用户都在/etc/sudoers中有记录，格式如下
+	# 这个是Centos 7.5 的配置
+	# User privilege specification
+	root		ALL=(ALL)ALL
+	username	ALL=(ALL)ALL
+
+	#有的系统是这样配置的
+	root		ALL=(ALL:ALL)ALL
+	username	ALL=(ALL:ALL)ALL
+
+
+	之后使用sudo 命令就可以用root身份去执行命令。在执行docker命令时，如果不使用 sudo 会报错误：
+比如执行：docker container ls
+Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock:
+Get http://%2Fvar%2Frun%2Fdocker.sock/v1.26/containers/json: dial unix /var/run/docker.sock: connect: permission(允许，许可) denied(否认，拒绝)
+
+	reliably 可靠地；确实地
+	determine vt（使）下决心，（使）做出决定； 限定 制作
+	fully	adv 完全地；充分地；彻底地； fully up 充分
+	qualified （qualify） 有资格的，适合的，胜任的；有限制的，不完全的；
+	domain n 领域，产业；地产；域名；
+
+
+	比如运行交互式的容器：docker run -i -t ubuntu:15.10 /bin/bash，运行完
+此时我们已经进入一个ubuntu15.10系统的容器，此时我们尝试在容器中运行命令
+cat /proc/verion 和 ls 分别查看当前系统的版本信息和当前目录下的文件里列表，可以使用
+exit命令或者使用CTRL+D.
+
+	docker logs [opts]
+	-f: 让docker logs 像使用tail -f 一样输出容器内的标准输出
+
+################## docker 命令#################################################################
+
+
+
+	列出宿主机上存放的docker容器列表
+		docker images
+			REPOSTITORY :表示镜像的仓库源
+			TAG :镜像的标签
+			IMAGE ID :镜像ID
+			CREATED :镜像创建时间
+			SIZE :镜像大小
+	同一个仓库源你可以有多个TAG，代表整个仓库源的不同个版本，比如ubuntu仓库源里，有15.10、14.04等多个不同的版本，我们使用REPOSTITORY:TAG 来定义不同的镜像。
+
+	列出所有运行中的Docker容器列表
+		docker container ls
+			Container ID ：一开始的几个字符对应你的容器的唯一 ID
+			Image ：你运行容器的镜像名
+			Command ：容器启动后运行的命令
+			Created ：创建时间
+			Status ：容器当前状态
+			Ports ：与宿主端口相连接的端口信息
+			Names ：容器名（如果你没有命名你的容器，那么会随机创建）
+			-a : 列出所有运行过的未删除镜像，也就是状态是 退出和运行中的镜像
+	查看某个docker 容器进程列表
+		查看容器内部运行的进程
+		docker container top [容器ID/容器名]
+			在输出结果中，它包含了容器所有细节，
+			UID（用户号）
+			PID（进程号）
+			PPID（父进程号）
+			STIME（开始时间）
+			TTY（所在终端）
+			TIME（使用CPU时间）
+			CMD（执行命令）
+
+		接着查询容器详细信息 ps -ef |grep -i [PID] ,结果可以看到存在root帐户运行的进程，该进程是几个进程的父进程
+		这里的进程号都可以在宿主的进程表中搜索到。这就是run命令 -p X:Y 参数做到的
+	查看正在运行的docker 容器列表
+		docker container ps [容器ID/容器名]
+	查看容器的端口映射
+		docker contaienr port [容器ID/容器名]
+	查看WEB应用程序日志
+		docker contaier logs  -f [容器ID/容器名]
+		-f : 让 dokcer logs 像使用 tail -f 一样来输出容器内部的标准输出。
+	检查 WEB应用程序
+		docker container inspect [容器ID/容器名]
+
+	停止docker 容器
+		docker container stop [容器ID/容器名]
+	启动docker 容器
+		docker container start [容器ID/容器名]
+	进入dockers容器
+		docker exec -it [容器ID/容器名] bash
+
+	运行docker容器
+		docker container run [opts]
+			-d :让容器在后台运行。
+			-p X:Y :将容器内部使用的网络端口映射到我们使用的主机上。 绑定容器的端口Y到宿主机的端口X，或者说，让主机端口X和容器端口Y建立通信
+			-P （大写）: 将容器内部端口随机映射到主机的高端口，默认绑定的都是tcp端口。
+			--name :命名你的容器。如果未指定，他将被赋予随机生成的名字，默认绑定的都是tcp端口，绑定UDP，在端口后面加 /udp
+			-e :当启动容器时传递环境编辑及其值
+
+			-i :在新容器内指定一个伪终端或终端
+			-t :允许你对容器内的标准输入（STDIN）进行交互
+			ps: sudo docker container run -t -i ubuntu:15:10 /bin/bash
+				如果不指定运行镜像的tag（标签），docker 默认是使用ubuntu:latest
+
+	查找镜像
+		docker search [镜像名]
+		ps: docker search ubuntu
+		docker Hub 网址为：https://hub.docker.com/
+
+	拖取镜像
+		docker pull [镜像名]
+		ps：docker pull ubuntu:15.10
+
+	删除镜像
+		docker rm [镜像ID/镜像名]
+		删除时容器必须时停止状态，否则会报错。
+	删除镜像源
+		docker rmi [IMAGE ID]
+		删除镜像
+	创建镜像
+		1、从已经创建的容器中更新镜像，并且提交这个镜像
+		2、使用Dockerfile 指令类创建一个新的镜像
+
+	#################################
+	Docker容器连接
+	端口映射并不是唯一把 docker 连接到另一个容器的方法。
+
+	docker有一个连接系统允许将多个容器连接在一起，共享连接信息。
+
+	docker连接会创建一个父子关系，其中父容器可以看到子容器的信息。
+
+
+
+######### docker 安装MySQL ########################
+## 挂在文件
+docker run -p 3306:3306 --name mysql -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456  -d mysql:5.7.21
+## 挂在文件和创建用户（没有给用户授权，需要手动授权）
+
+
+docker run -d --name dc-sonar -p 9000:9000 -p 9092:9092 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://172.17.0.2:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
+docker run -d --name dc-sonar -p 9000:9000 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://127.0.0.1:3305/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
+
+
+############### docker mysql ############################
+关于 docker soanrqube + msysql 的 关于java.lang.IllegalStateException: Can not connect to database. Please check connectivity and settings (see the properties prefixed by 'sonar.jdbc.').错误的解决方案
+请看：https://github.com/thyrlian/SonarOnDocker 目前，还有有解决
+####  这一条命令可以成功执行
+docker run --name mysql -e MYSQL_ROOT_PASSWORD=123456 -p 3306:3306 -d mysql:5.7.21
+ 或者是使用挂载路径的方式(以验证可以使用，注意不要挂在到/var/lib/mysql,会报错，这个问题浪费两天时间)：
+ 使用-v 挂在文件之前，需要先创建源文件挂载文件存在,挂在的配置文件必须是my.cnf，如果是my.conf或者mysql.conf都是错误的。
+docker run -p 3306:3306 --name mysql -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456  -d mysql:5.7.21
+docker run --name mysql -p 3307:3306 --restart always -v ~/mysql/data:/var/lib/mysql -v ~/mysql/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+docker run --name mysql -p 3307:3306 --restart always --privileged=true -v ~/mysql/data:/var/lib/mysql -v ~/mysql/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+
+docker run -d --name sonar -p 9000:9000 -e "SONARQUBE_JDBC_USERNAME=sonar" -e "SONARQUBE_JDBC_PASSWORD=123456" -e "SONARQUBE_JDBC_URL=jdbc:mysql://127.0.0.1:3306/sonar?useUnicode=true&characterEncoding=utf8&rewriteBatchedStatements=true&useConfigs=maxPerformance&useSSL=false" sonarqube:latest
+
+############### docker 搭建 soanr+postgresql    #############################
+目前，已经搭建成功。
+docker run --name pgdb -e POSTGRES_USER=sonar -e POSTGRES_PASSWORD=sonar -d postgres
+
+docker run --name dc-sonar --link pgdb -e SONARQUBE_JDBC_URL=jdbc:postgresql://pgdb:5432/sonar -p 9000:9000 -d sonarqube
+
+
+
+
+############ 查看linux 登陆日志 ##############
+cat var/log/secure  日志中两行登录日志
+
+
+docker run -p 3306:3306 --name mysql -v $PWD/conf/my.cnf:/etc/mysql/my.cnf -v $PWD/logs:/logs -v $PWD/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -d mysql:5.7.21
+
+
+
+sudo docker run -d -p 3308:3306 --name mysql --restart always --privileged=true  -v ~/mysql/conf/my.cnf:/etc/mysql/my.cnf -v ~/mysql/logs:/logs -v ~/mysql/data:/mysql_data -e MYSQL_ROOT_PASSWORD=123456 -e MYSQL_USER="clayton" -e MYSQL_PASSWORD="123456" -e MYSQL_ROOT_PASSWORD="123456"  mysql:5.7.21
+
+
+docker容器出现这个错误 iptables failed: iptables --wait -t nat -A DOCKER&n
+解决方法：需要重启docker服务
+systemctl restart docker
+
+
+
+#7月14日申请筛选数据
+{
+	"params": {
+		"modelId": "201807051744084284665,201807131343303824705,201807131350395844706,201807131359462874707,201807131403400024708,201807131410436394709,201807131414576774710,201807131419300594711",
+		"uuid": "45e08735-70cd-4a62-afc3-965fe14c06fc",
+		"onestPrefix": "cluster2",
+		"dataSounceType": 99910086,
+		"fnomFile": "epc|DHXX_zyzj_0_20180714152503_zyzx_99910086_TRANS_INPUT_0d8f6eba-8b4b-477d-adb0-753d79cbb97f_l.txt",
+		"toFile": "epc|DHXX_zyzj_0_20180704165608_zyzx_99910086_FILTER_INPUT_0d8f6eba-8b4b-477d-adb0-753d79cbb97f_l.txt"
+	}
+}
